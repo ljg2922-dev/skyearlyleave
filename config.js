@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════ */
 window.CONFIG = {
   // Apps Script 웹 앱 주소 (…/exec 로 끝나는 주소)
-  API_URL: 'https://script.google.com/macros/s/AKfycbwJ0j0fLSZzyU-L7heJAA9dq5immMACYgoOYHNBvGt1hzXOOE3dLofFiygSb4SENxxe/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbwolnaEyMpZsfgVaJ0iDjdn8w1--PovFZuIA3R3WliMOq-Hxs0rDNLhciHi7o_yhdIz/exec',
 
   // 학년별 학급 수 (1학년 ~ 6학년)
   CLASSES: [9, 9, 9, 9, 9, 8]
