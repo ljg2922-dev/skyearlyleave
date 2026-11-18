@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>조퇴증 발급 · 인천하늘초</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231f7aec'/%3E%3Cpath d='M7 18.5h10.2a4.3 4.3 0 0 0 .55-8.56A5.8 5.8 0 0 0 6.6 9.3 4.6 4.6 0 0 0 7 18.5Z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .note{margin:16px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .sheet-actions.three .primary{grid-column:1/-1}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="mark"><svg viewBox="0 0 24 24"><path d="M7 18.5h10.2a4.3 4.3 0 0 0 .55-8.56A5.8 5.8 0 0 0 6.6 9.3 4.6 4.6 0 0 0 7 18.5Z" fill="#fff"/></svg></span>
+      <div><small>인천하늘초등학교</small><b>조퇴증 발급</b></div>
+    </div>
+    <div class="top-right">
+      <button id="logout" class="ghost sm hidden">잠금</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="boot" class="boot"><span class="spin"></span>불러오는 중…</div>
+
+  <!-- 입장 비밀번호 -->
+  <section id="login" class="card narrow hidden">
+    <div class="lock"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+    <h2>입장 비밀번호</h2>
+    <p class="muted">조퇴증 발급 사이트 비밀번호를 입력하세요.</p>
+    <input id="pin" type="password" inputmode="numeric" placeholder="••••" autocomplete="off">
+    <button id="loginBtn" class="primary block lg" style="margin-top:12px">확인</button>
+    <p id="loginErr" class="err"></p>
+  </section>
+
+  <div id="app" class="hidden">
+    <div class="page-head">
+      <div><h1>조퇴증 발급</h1><p id="today"></p></div>
+    </div>
+
+    <div class="grid2">
+      <section class="card">
+        <form id="f" autocomplete="off">
+          <div class="group">
+            <div class="eyebrow">학생</div>
+            <div class="row3">
+              <label>학년<select name="grade"></select></label>
+              <label>반<select name="cls"></select></label>
+              <label>번호<input name="num" type="number" inputmode="numeric" min="1" max="50" placeholder="선택"></label>
+            </div>
+            <label>이름<input name="name" maxlength="20" required placeholder="학생 이름"></label>
+          </div>
+
+          <div class="group">
+            <div class="eyebrow">조퇴 정보</div>
+            <label>조퇴 시각<input name="time" type="time" required></label>
+            <span class="lbl">사유</span>
+            <div class="chips">
+              <label><input type="radio" name="reasonSel" value="병원 진료" checked><span>병원 진료</span></label>
+              <label><input type="radio" name="reasonSel" value="몸이 아픔(보건실 확인)"><span>몸이 아픔</span></label>
+              <label><input type="radio" name="reasonSel" value="가정 사정"><span>가정 사정</span></label>
+              <label><input type="radio" name="reasonSel" value="교외 활동"><span>교외 활동</span></label>
+              <label><input type="radio" name="reasonSel" value="기타"><span>기타</span></label>
+            </div>
+            <input name="reasonEtc" class="hidden field-gap" maxlength="60" placeholder="사유를 입력하세요" style="margin-top:0">
+            <fieldset class="seg" style="margin-top:4px">
+              <legend>하교 방법</legend>
+              <div class="opts">
+                <label><input type="radio" name="method" value="보호자 동행" checked><span>보호자 동행</span></label>
+                <label><input type="radio" name="method" value="보호자 동의 후 혼자 하교"><span>동의 후 혼자 하교</span></label>
+              </div>
+            </fieldset>
+            <label><span id="handlerLabel">인계 보호자</span><input name="handler" maxlength="40" placeholder="예: 어머니 김○○"></label>
+          </div>
+
+          <div class="group">
+            <div class="eyebrow">발급</div>
+            <label>발급 교사<input name="teacher" maxlength="30" required placeholder="예: 3-2 담임 이○○"></label>
+            <button class="primary block lg" type="submit">조퇴증 발급하기</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div><h2>오늘 발급 현황</h2><p id="summary">불러오는 중</p></div>
+          <label class="check"><input type="checkbox" id="mine"> 내가 발급한 것만</label>
+        </div>
+        <div id="list" class="list"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="sheet">
+    <div class="sheet-icon" id="mIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 id="mTitle">조퇴증이 발급되었어요</h3>
+    <p id="mWho" class="sub"></p>
+    <div class="qr-frame"><div id="qr" class="qr"></div></div>
+    <p class="hint">학생 휴대폰 카메라로 QR을 찍으면 조퇴증 사진을 저장할 수 있어요.<br>보호자에게는 링크나 사진을 보내도 됩니다.</p>
+    <div class="linkbox"><input id="mLink" readonly><button id="copy" class="btn-line">복사</button></div>
+    <div class="sheet-actions three">
+      <button id="mSave" class="btn-line">사진 저장</button>
+      <a id="mOpen" class="btn btn-line" target="_blank" rel="noopener">미리보기</a>
+      <button id="mClose" class="primary">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+<script>
+const C = window.CONFIG || {};
+const f = $('#f');
+let PIN = null, slips = [], current = null;
+
+$('#today').textContent = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+
+/* ── 폼 기본값 ── */
+for (let i = 1; i <= 6; i++) f.grade.add(new Option(i + '학년', i));
+function fillClasses() {
+  const n = (C.CLASSES || [])[f.grade.value - 1] || 12, prev = Number(f.cls.value);
+  f.cls.innerHTML = '';
+  for (let i = 1; i <= n; i++) f.cls.add(new Option(i + '반', i));
+  if (prev && prev <= n) f.cls.value = prev;
+}
+f.grade.onchange = fillClasses;
+try {
+  const last = JSON.parse(store.get('lastClass') || '{}');
+  if (last.grade) f.grade.value = last.grade;
+  fillClasses();
+  if (last.cls) f.cls.value = last.cls;
+} catch (e) { fillClasses(); }
+f.teacher.value = store.get('teacherName') || '';
+$('#mine').checked = store.get('onlyMine') === '1';
+setDefaultTime();
+
+function setDefaultTime() {
+  const d = new Date();
+  d.setMinutes(Math.ceil((d.getMinutes() + 1) / 10) * 10, 0, 0);
+  f.time.value = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+f.querySelectorAll('[name=reasonSel]').forEach(r => r.onchange = () => {
+  const etc = f.elements.reasonSel.value === '기타';
+  f.reasonEtc.classList.toggle('hidden', !etc);
+  if (etc) f.reasonEtc.focus();
+});
+f.querySelectorAll('[name=method]').forEach(r => r.onchange = () => {
+  const alone = f.elements.method.value !== '보호자 동행';
+  $('#handlerLabel').textContent = alone ? '동의한 보호자' : '인계 보호자';
+});
+
+/* ── 화면 전환 ── */
+function show(id) {
+  $('#boot').classList.add('hidden');
+  ['login', 'app'].forEach(x => $('#' + x).classList.toggle('hidden', x !== id));
+  $('#logout').classList.toggle('hidden', id !== 'app');
+}
+
+/* ── 입장 비밀번호 ── */
+async function tryLogin(p, silent) {
+  $('#loginErr').textContent = '';
+  try {
+    await run('verifyPin', 'teacher', p);
+    PIN = p; store.set('pin_teacher', p);
+    show('app');
+    load();
+  } catch (e) {
+    store.del('pin_teacher');
+    show('login');
+    if (!silent) $('#loginErr').textContent = e.message;
+  }
+}
+$('#loginBtn').onclick = () => tryLogin($('#pin').value.trim());
+$('#pin').onkeydown = e => { if (e.key === 'Enter') $('#loginBtn').click(); };
+$('#logout').onclick = () => {
+  store.del('pin_teacher'); PIN = null; $('#pin').value = '';
+  show('login');
+};
+const saved = store.get('pin_teacher');
+if (saved) tryLogin(saved, true); else show('login');
+
+/* ── 발급 ── */
+f.onsubmit = async e => {
+  e.preventDefault();
+  const sel = f.elements.reasonSel.value;
+  const reason = sel === '기타' ? f.reasonEtc.value.trim() : sel;
+  if (!reason) return toast('사유를 입력하세요.');
+  const data = {
+    grade: f.grade.value, cls: f.cls.value, num: f.num.value, name: f.name.value,
+    time: f.time.value, reason, method: f.elements.method.value,
+    handler: f.handler.value, teacher: f.teacher.value
+  };
+  const btn = f.querySelector('[type=submit]');
+  btn.disabled = true; btn.textContent = '발급 중…';
+  try {
+    const s = await run('issueSlip', PIN, data);
+    store.set('teacherName', data.teacher);
+    store.set('lastClass', JSON.stringify({ grade: data.grade, cls: data.cls }));
+    showQR(s, true);
+    f.name.value = ''; f.num.value = ''; f.handler.value = '';
+    setDefaultTime();
+    load();
+  } catch (err) { toast(err.message); }
+  finally { btn.disabled = false; btn.textContent = '조퇴증 발급하기'; }
+};
+
+function showQR(s, isNew) {
+  current = s;
+  const url = passUrl(s.id);
+  $('#mIcon').classList.toggle('hidden', !isNew);
+  $('#mTitle').textContent = isNew ? '조퇴증이 발급되었어요' : '조퇴증 QR';
+  $('#mWho').innerHTML = `${who(s)} · ${esc(s.time)} 조퇴`;
+  makeQR($('#qr'), url, 200);
+  $('#mLink').value = url;
+  $('#mOpen').href = url;
+  $('#modal').classList.remove('hidden');
+}
+$('#mClose').onclick = () => $('#modal').classList.add('hidden');
+$('#modal').onclick = e => { if (e.target.id === 'modal') $('#modal').classList.add('hidden'); };
+$('#copy').onclick = () => copyText($('#mLink'));
+$('#mSave').onclick = async () => {
+  if (!current) return;
+  const b = $('#mSave'); b.disabled = true;
+  try { await saveCanvas(await drawSlip(current), slipFileName(current)); toast('조퇴증 사진을 저장했어요.'); }
+  catch (e) { toast('사진 저장에 실패했어요. 미리보기에서 저장해 주세요.'); }
+  finally { b.disabled = false; }
+};
+
+/* ── 오늘 현황 ── */
+async function load() {
+  if (!PIN) return;
+  try { slips = await run('listToday', 'teacher', PIN); render(); }
+  catch (e) { toast(e.message); }
+}
+function render() {
+  const live = slips.filter(s => s.status !== '취소');
+  const out = live.filter(s => s.status === '외출확인').length;
+  $('#summary').textContent = live.length
+    ? `발급 ${live.length}건 · 교문 통과 ${out}건 · 대기 ${live.length - out}건`
+    : '아직 발급한 조퇴증이 없어요';
+
+  const me = (store.get('teacherName') || '').trim();
+  const list = $('#mine').checked && me ? slips.filter(s => s.teacher === me) : slips;
+  const el = $('#list');
+  if (!list.length) { el.innerHTML = '<div class="empty">오늘 발급한 조퇴증이 없어요.</div>'; return; }
+  el.innerHTML = list.map(s => `
+    <div class="item st-${stCls(s.status)}">
+      <div class="time">${esc(s.time)}<small>조퇴</small></div>
+      <div class="info">
+        <b>${who(s)}</b>
+        <span>${esc(s.reason)} · ${esc(s.method)}${s.handler ? ' · ' + esc(s.handler) : ''}</span>
+        <span>${esc(s.teacher)} · ${esc(hm(s.issuedAt))} 발급${s.checkedAt ? ' · ' + esc(hm(s.checkedAt)) + ' 교문 통과' : ''}</span>
+      </div>
+      <div class="act">${chip(s.status)}${s.status === '발급' ? `
+        <button class="btn-line sm" data-qr="${esc(s.id)}">QR</button>
+        <button class="btn-line sm danger" data-cancel="${esc(s.id)}">취소</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+$('#mine').onchange = () => { store.set('onlyMine', $('#mine').checked ? '1' : '0'); render(); };
+$('#list').onclick = async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const s = slips.find(x => x.id === (b.dataset.qr || b.dataset.cancel));
+  if (!s) return;
+  if (b.dataset.qr) return showQR(s, false);
+  if (!confirm(`${s.name} 학생의 조퇴증을 취소할까요?`)) return;
+  b.disabled = true;
+  try { await run('cancelSlip', PIN, s.id); toast('취소했어요.'); load(); }
+  catch (err) { toast(err.message); b.disabled = false; }
+};
+setInterval(load, 60000);
+</script>
+</body>
+</html>
